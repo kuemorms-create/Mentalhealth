@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบประเมินสุขภาพจิต</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3250;
+    --accent-blue: #4f8ef7;
+    --accent-purple: #a78bfa;
+    --accent-green: #34d399;
+    --accent-orange: #fb923c;
+    --accent-red: #f87171;
+    --text: #e8eaf6;
+    --text-muted: #8892b0;
+    --text-dim: #4a5280;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(79,142,247,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 50% 50%, rgba(52,211,153,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .header-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 32px rgba(79,142,247,0.3);
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    margin-bottom: 28px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Stage badge */
+  .stage-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+  .badge-2q { background: rgba(167,139,250,0.15); color: var(--accent-purple); border: 1px solid rgba(167,139,250,0.3); }
+  .badge-9q { background: rgba(79,142,247,0.15); color: var(--accent-blue); border: 1px solid rgba(79,142,247,0.3); }
+  .badge-8q { background: rgba(248,113,113,0.15); color: var(--accent-red); border: 1px solid rgba(248,113,113,0.3); }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.4s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), transparent);
+    opacity: 0.6;
+  }
+
+  .question-num {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  .question-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: -12px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-orange);
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .option:hover {
+    border-color: var(--accent-blue);
+    background: rgba(79,142,247,0.08);
+    transform: translateX(3px);
+  }
+
+  .option.selected {
+    border-color: var(--accent-blue);
+    background: rgba(79,142,247,0.12);
+  }
+
+  .option.selected .opt-radio {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.2);
+  }
+
+  .opt-radio {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .opt-radio::after {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s ease;
+  }
+
+  .option.selected .opt-radio::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .opt-label { font-size: 15px; color: var(--text); flex: 1; }
+  .opt-score {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    background: var(--bg);
+    padding: 2px 7px;
+    border-radius: 5px;
+  }
+
+  /* Yes/No buttons */
+  .yesno { display: flex; gap: 12px; }
+
+  .yesno-btn {
+    flex: 1;
+    padding: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface2);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .yesno-btn:hover { transform: translateY(-2px); }
+
+  .yesno-btn.yes-btn:hover, .yesno-btn.yes-btn.selected {
+    border-color: var(--accent-green);
+    background: rgba(52,211,153,0.1);
+    color: var(--accent-green);
+    box-shadow: 0 4px 16px rgba(52,211,153,0.15);
+  }
+
+  .yesno-btn.no-btn:hover, .yesno-btn.no-btn.selected {
+    border-color: #60a5fa;
+    background: rgba(96,165,250,0.1);
+    color: #60a5fa;
+    box-shadow: 0 4px 16px rgba(96,165,250,0.15);
+  }
+
+  /* Navigation */
+  .nav { display: flex; gap: 12px; margin-top: 24px; }
+
+  .btn {
+    padding: 14px 24px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    box-shadow: 0 4px 16px rgba(79,142,247,0.3);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(79,142,247,0.4);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 14px 20px;
+  }
+
+  .btn-secondary:hover { background: var(--border); color: var(--text); }
+
+  /* Score summary card */
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .score-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .score-info { flex: 1; }
+  .score-name { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .score-val { font-size: 18px; font-weight: 700; }
+  .score-interp { font-size: 13px; margin-top: 2px; }
+
+  /* Result page */
+  .result-hero {
+    text-align: center;
+    padding: 32px 0 24px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .result-icon {
+    width: 80px; height: 80px;
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 20px;
+    animation: popIn 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  .result-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .result-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Score breakdown */
+  .score-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .score-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .score-box .num {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-box .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .score-box .level {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+    display: inline-block;
+  }
+
+  /* Action plan */
+  .action-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.4s 0.1s ease both;
+  }
+
+  .action-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .action-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .action-dot {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .action-content .action-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .action-content .action-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Alert */
+  .alert-urgent {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.4);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .alert-urgent .icon { font-size: 20px; flex-shrink: 0; }
+
+  .alert-urgent .text { font-size: 14px; line-height: 1.6; }
+
+  .alert-urgent strong { color: var(--accent-red); display: block; margin-bottom: 4px; font-size: 15px; }
+
+  /* Hotline */
+  .hotline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .hotline-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .hotline-btn:hover {
+    border-color: var(--accent-green);
+    background: rgba(52,211,153,0.08);
+    color: var(--accent-green);
+    transform: translateY(-1px);
+  }
+
+  .hotline-btn .num {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* Patient info form */
+  .field-group { display: flex; flex-direction: column; gap: 16px; }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+  }
+
+  .field-input:focus {
+    border-color: var(--accent-blue);
+    background: rgba(79,142,247,0.06);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.12);
+  }
+
+  .field-input::placeholder { color: var(--text-dim); }
+
+  .field-input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.6);
+    cursor: pointer;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Patient info chip shown during assessment */
+  .patient-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .patient-chip strong { color: var(--text); font-weight: 600; }
+
+  /* Result patient header */
+  .result-patient-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .rpb-item { display: flex; flex-direction: column; gap: 2px; }
+  .rpb-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; }
+  .rpb-val { font-size: 15px; font-weight: 700; color: var(--text); }
+
+  /* Print button */
+  .btn-print {
+    width: 100%;
+    padding: 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--accent-blue);
+    border-radius: var(--radius-sm);
+    color: var(--accent-blue);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-print:hover {
+    background: rgba(79,142,247,0.1);
+    transform: translateY(-1px);
+  }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    body { background: white !important; color: #111 !important; }
+    body::before { display: none; }
+    .no-print { display: none !important; }
+    .container { padding: 0 !important; max-width: 100% !important; }
+    .header { padding: 10px 0 !important; }
+    .header-icon, .header p { display: none; }
+    .header h1 { color: #111 !important; font-size: 18px !important; }
+
+    :root {
+      --bg: white;
+      --surface: #f8f9fa;
+      --surface2: #f0f2f5;
+      --border: #dee2e6;
+      --text: #111;
+      --text-muted: #555;
+      --text-dim: #888;
+      --accent-blue: #1a56db;
+      --accent-green: #057a55;
+      --accent-orange: #c05621;
+      --accent-red: #c81e1e;
+      --accent-purple: #7e3af2;
+    }
+
+    .card, .score-card, .action-section, .result-patient-bar, .score-box, .alert-urgent {
+      border: 1px solid #ccc !important;
+      box-shadow: none !important;
+      break-inside: avoid;
+    }
+
+    .progress-wrap, .stage-badge, .nav, .btn-print, .btn-restart,
+    .hotline-grid, .patient-chip { display: none !important; }
+
+    .result-hero { padding: 12px 0 !important; }
+    .result-icon { width: 48px !important; height: 48px !important; font-size: 24px !important; }
+    .result-title { font-size: 18px !important; }
+
+    .score-breakdown { grid-template-columns: repeat(3, 1fr) !important; }
+    .score-box .num { font-size: 28px !important; }
+
+    .action-section { page-break-inside: avoid; }
+
+    .print-hotline { display: block !important; }
+  }
+
+  .print-hotline {
+    display: none;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #555;
+  }
+
+  /* Restart btn */
+  .btn-restart {
+    width: 100%;
+    padding: 16px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+  }
+
+  .btn-restart:hover { border-color: var(--text-muted); color: var(--text); }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.6); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .hidden { display: none !important; }
+
+  /* Transition wrapper */
+  .step { animation: fadeUp 0.35s ease both; }
+
+  /* Color helpers */
+  .c-green { color: var(--accent-green); }
+  .c-blue { color: var(--accent-blue); }
+  .c-orange { color: var(--accent-orange); }
+  .c-red { color: var(--accent-red); }
+  .c-purple { color: var(--accent-purple); }
+
+  .bg-green { background: rgba(52,211,153,0.15); }
+  .bg-blue { background: rgba(79,142,247,0.15); }
+  .bg-orange { background: rgba(251,146,60,0.15); }
+  .bg-red { background: rgba(248,113,113,0.15); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-icon">🧠</div>
+    <h1>แบบประเมินสุขภาพจิต</h1>
+    <p>คัดกรองโรคซึมเศร้าและประเมินความเสี่ยงการฆ่าตัวตาย<br>จาก กรมสุขภาพจิต กระทรวงสาธารณสุข</p>
+  </div>
+
+  <div id="app"></div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const questions2Q = [
+  { id: 'q2_1', text: 'ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้ ท่านรู้สึก หดหู่ เศร้า หรือท้อแท้สิ้นหวัง หรือไม่', type: 'yesno' },
+  { id: 'q2_2', text: 'ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้ ท่านรู้สึก เบื่อ ทำอะไรก็ไม่เพลิดเพลิน หรือไม่', type: 'yesno' }
+];
+
+const questions9Q = [
+  { id: 'q9_1', text: '1. เบื่อ ไม่สนใจอยากทำอะไร' },
+  { id: 'q9_2', text: '2. ไม่สบายใจ ซึมเศร้า ท้อแท้' },
+  { id: 'q9_3', text: '3. หลับยากหรือหลับตื่นๆ หรือหลับมากไป' },
+  { id: 'q9_4', text: '4. เหนื่อยง่ายหรือไม่ค่อยมีแรง' },
+  { id: 'q9_5', text: '5. เบื่ออาหารหรือกินมากเกินไป' },
+  { id: 'q9_6', text: '6. รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลวหรือครอบครัวผิดหวัง' },
+  { id: 'q9_7', text: '7. สมาธิไม่ดี เวลาทำอะไร เช่น ดูโทรทัศน์ ฟังวิทยุ หรือทำงานที่ต้องใช้ความตั้งใจ' },
+  { id: 'q9_8', text: '8. พูดช้า ทำอะไรช้าลงจนคนอื่นสังเกตเห็นได้ หรือกระสับกระส่ายไม่สามารถอยู่นิ่งได้เหมือนที่เคยเป็น' },
+  { id: 'q9_9', text: '9. คิดทำร้ายตนเอง หรือคิดว่าถ้าตายไปคงจะดี' },
+];
+
+const options9Q = [
+  { label: 'ไม่มีเลย', score: 0 },
+  { label: 'เป็นบางวัน (1-7 วัน)', score: 1 },
+  { label: 'เป็นบ่อย (>7 วัน)', score: 2 },
+  { label: 'เป็นทุกวัน', score: 3 },
+];
+
+const questions8Q = [
+  { id: 'q8_1', text: 'คิดอยากตาย หรือ คิดว่าตายไปจะดีกว่า', scoreYes: 1, type: 'yesno' },
+  { id: 'q8_2', text: 'อยากทำร้ายตัวเอง หรือ ทำให้ตัวเองบาดเจ็บ', scoreYes: 2, type: 'yesno' },
+  {
+    id: 'q8_3', text: 'คิดเกี่ยวกับ<strong>การฆ่าตัวตาย</strong>', scoreYes: 6, type: 'yesno',
+    followup: {
+      text: '(ถ้าตอบว่าคิดเกี่ยวกับการฆ่าตัวตายให้ถามต่อ) ท่านสามารถควบคุมความอยากฆ่าตัวตายที่ท่านคิดอยู่นี้ได้หรือไม่ หรือบอกได้ไหมว่าคงจะไม่ทำตามความคิดนั้นในขณะนี้',
+      yesLabel: 'ได้ (0)', noLabel: 'ไม่ได้ (8)',
+      yesScore: 0, noScore: 8, key: 'q8_3b'
+    }
+  },
+  { id: 'q8_4', text: 'มีแผนการที่จะฆ่าตัวตาย', scoreYes: 8, type: 'yesno' },
+  { id: 'q8_5', text: 'ได้เตรียมการที่จะทำร้ายตนเองหรือเตรียมการจะฆ่าตัวตายโดยตั้งใจว่าจะให้ตายจริงๆ', scoreYes: 9, type: 'yesno' },
+  { id: 'q8_6', text: 'ได้ทำให้ตนเองบาดเจ็บแต่ไม่ตั้งใจที่จะทำให้เสียชีวิต', scoreYes: 4, type: 'yesno' },
+  { id: 'q8_7', text: 'ได้พยายามฆ่าตัวตายโดยคาดหวัง/ตั้งใจที่จะให้ตาย', scoreYes: 10, type: 'yesno' },
+  { id: 'q8_8', text: 'ท่านเคยพยายามฆ่าตัวตาย', scoreYes: 4, type: 'yesno', period: 'ตลอดชีวิตที่ผ่านมา' },
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+
+let state = {
+  phase: 'patient', // patient | welcome | 2q | 9q | 8q | result
+  hn: '',
+  assessDate: '',
+  assessorName: '',
+  q2Answers: {},
+  q9Answers: {},
+  q8Answers: {},
+  q2Score: 0,
+  q9Score: 0,
+  q8Score: 0,
+  current2Q: 0,
+  current9Q: 0,
+  current8Q: 0,
+  show8Q: false,
+  stoppedEarly: false,
+  stopReason: ''
+};
+
+function resetState() {
+  state = {
+    phase: 'patient',
+    hn: '', assessDate: '', assessorName: '',
+    q2Answers: {}, q9Answers: {}, q8Answers: {},
+    q2Score: 0, q9Score: 0, q8Score: 0,
+    current2Q: 0, current9Q: 0, current8Q: 0,
+    show8Q: false, stoppedEarly: false, stopReason: ''
+  };
+}
+
+// ─── SCORING & INTERPRETATION ───────────────────────────────────────────────
+
+function get2QResult() {
+  const hasYes = Object.values(state.q2Answers).some(v => v === 'yes');
+  return {
+    positive: hasYes,
+    label: hasYes ? 'มีความเสี่ยง — ควรประเมินต่อ (9Q)' : 'ไม่เป็นโรคซึมเศร้า',
+    color: hasYes ? 'orange' : 'green'
+  };
+}
+
+function get9QLevel(score) {
+  if (score < 7) return { level: 'ไม่มีอาการ / น้อยมาก', color: 'green', action: 'low' };
+  if (score <= 12) return { level: 'ระดับน้อย', color: 'blue', action: 'mild' };
+  if (score <= 18) return { level: 'ระดับปานกลาง', color: 'orange', action: 'moderate' };
+  return { level: 'ระดับรุนแรง', color: 'red', action: 'severe' };
+}
+
+function get8QLevel(score) {
+  if (score === 0) return { level: 'ไม่มีแนวโน้ม', color: 'green', action: 'none' };
+  if (score <= 8) return { level: 'ระดับน้อย', color: 'blue', action: 'mild' };
+  if (score <= 16) return { level: 'ระดับปานกลาง', color: 'orange', action: 'moderate' };
+  return { level: 'ระดับรุนแรง', color: 'red', action: 'severe' };
+}
+
+function calc9QScore() {
+  return Object.values(state.q9Answers).reduce((a, b) => a + b, 0);
+}
+
+function calc8QScore() {
+  let s = 0;
+  for (const [k, v] of Object.entries(state.q8Answers)) {
+    if (k === 'q8_3b') { s += (v === 'no' ? 8 : 0); continue; }
+    const q = questions8Q.find(q => q.id === k);
+    if (q && v === 'yes') s += q.scoreYes;
+  }
+  return s;
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+
+function render() {
+  const app = document.getElementById('app');
+  switch (state.phase) {
+    case 'patient': app.innerHTML = renderPatient(); break;
+    case 'welcome': app.innerHTML = renderWelcome(); break;
+    case '2q': app.innerHTML = render2Q(); break;
+    case '9q': app.innerHTML = render9Q(); break;
+    case '8q': app.innerHTML = render8Q(); break;
+    case 'result': app.innerHTML = renderResult(); break;
+  }
+}
+
+function renderPatient() {
+  // Default date to today
+  const today = new Date().toISOString().split('T')[0];
+  const dateVal = state.assessDate || today;
+
+  return `
+  <div class="step">
+    <div class="card">
+      <div class="question-num">ข้อมูลผู้รับการประเมิน</div>
+      <div class="question-text" style="margin-bottom:20px;">กรอกข้อมูลก่อนเริ่มการประเมิน</div>
+
+      <div class="field-group">
+        <div>
+          <div class="field-label">HN (Hospital Number)</div>
+          <input
+            class="field-input"
+            type="text"
+            id="inp-hn"
+            placeholder="เช่น 12345678"
+            value="${state.hn}"
+            oninput="state.hn=this.value; updateStartBtn()"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-row">
+          <div>
+            <div class="field-label">วันที่ประเมิน</div>
+            <input
+              class="field-input"
+              type="date"
+              id="inp-date"
+              value="${dateVal}"
+              oninput="state.assessDate=this.value; updateStartBtn()"
+            />
+          </div>
+          <div>
+            <div class="field-label">ผู้ประเมิน (ไม่บังคับ)</div>
+            <input
+              class="field-input"
+              type="text"
+              id="inp-assessor"
+              placeholder="ชื่อผู้ประเมิน"
+              value="${state.assessorName}"
+              oninput="state.assessorName=this.value"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:12px 14px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
+        🔒 ข้อมูลทั้งหมดถูกเก็บไว้ในเบราว์เซอร์เท่านั้น ไม่มีการส่งออกสู่ภายนอก
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-primary" id="btn-start-patient" onclick="startFromPatient()" ${!state.hn.trim() ? 'disabled' : ''}>
+        เริ่มการประเมิน →
+      </button>
+    </div>
+  </div>`;
+}
+
+function updateStartBtn() {
+  const btn = document.getElementById('btn-start-patient');
+  if (btn) btn.disabled = !state.hn.trim();
+}
+
+function startFromPatient() {
+  // Save date if not set
+  if (!state.assessDate) {
+    state.assessDate = new Date().toISOString().split('T')[0];
+  }
+  state.phase = '2q';
+  render();
+}
+
+function renderWelcome() {
+  return `
+  <div class="step">
+    <div class="card">
+      <div class="question-num">เกี่ยวกับแบบประเมินนี้</div>
+      <div class="question-text" style="margin-bottom:12px;">แบบประเมินนี้ประกอบด้วย 3 ส่วน</div>
+      ${['🔵 2Q — คัดกรองโรคซึมเศร้าเบื้องต้น (2 ข้อ)',
+         '🟠 9Q — ประเมินระดับโรคซึมเศร้า (9 ข้อ)',
+         '🔴 8Q — ประเมินความเสี่ยงการฆ่าตัวตาย (8 ข้อ)'].map(t => `
+        <div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">${t}</div>
+      `).join('')}
+      <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
+        ⚠️ แบบประเมินนี้ใช้สำหรับคัดกรองเบื้องต้นเท่านั้น ไม่ใช่การวินิจฉัยโรค หากมีความกังวลควรพบแพทย์หรือผู้เชี่ยวชาญ
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn btn-primary" onclick="startAssessment()">เริ่มการประเมิน →</button>
+    </div>
+  </div>`;
+}
+
+function render2Q() {
+  const q = questions2Q[state.current2Q];
+  const total = questions2Q.length;
+  const pct = (state.current2Q / total) * 100;
+  const ans = state.q2Answers[q.id];
+
+  return `
+  <div class="step">
+    <div class="progress-wrap no-print">
+      <div class="progress-label"><span>2Q — คัดกรองซึมเศร้า</span><span>${state.current2Q + 1} / ${total}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.max(pct,8)}%"></div></div>
+    </div>
+    <span class="stage-badge badge-2q no-print">● แบบคัดกรอง 2Q</span>
+    ${patientChip()}
+    <div class="card">
+      <div class="question-num">คำถามที่ ${state.current2Q + 1} จาก ${total}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="yesno">
+        <button class="yesno-btn yes-btn ${ans === 'yes' ? 'selected' : ''}" onclick="answer2Q('${q.id}','yes')">
+          ✓ มี
+        </button>
+        <button class="yesno-btn no-btn ${ans === 'no' ? 'selected' : ''}" onclick="answer2Q('${q.id}','no')">
+          ✗ ไม่มี
+        </button>
+      </div>
+    </div>
+    <div class="nav no-print">
+      <button class="btn btn-secondary" onclick="back2Q()">← แก้ไข HN</button>
+      <button class="btn btn-primary" onclick="next2Q()" ${!ans ? 'disabled' : ''}>
+        ${state.current2Q === total - 1 ? 'ดูผลคัดกรอง →' : 'ถัดไป →'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function render9Q() {
+  const q = questions9Q[state.current9Q];
+  const total = questions9Q.length;
+  const pct = ((state.current9Q) / total) * 100;
+  const ans = state.q9Answers[q.id];
+  const score9 = calc9QScore();
+
+  return `
+  <div class="step">
+    <div class="progress-wrap no-print">
+      <div class="progress-label"><span>9Q — ประเมินซึมเศร้า</span><span>${state.current9Q + 1} / ${total}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.max(pct,5)}%"></div></div>
+    </div>
+    <span class="stage-badge badge-9q no-print">● แบบประเมิน 9Q</span>
+    ${patientChip()}
+    ${state.current9Q > 0 ? `
+    <div class="score-card">
+      <div class="score-circle bg-blue c-blue">${score9}</div>
+      <div class="score-info">
+        <div class="score-name">คะแนน 9Q สะสม</div>
+        <div class="score-val c-blue">${score9} คะแนน</div>
+        <div class="score-interp" style="color:var(--text-muted);font-size:12px;">${get9QLevel(score9).level}</div>
+      </div>
+    </div>` : ''}
+    <div class="card">
+      <div class="question-num">ในช่วง 2 สัปดาห์ที่ผ่านมา — ข้อ ${state.current9Q + 1} จาก ${total}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="options">
+        ${options9Q.map((opt, i) => `
+          <div class="option ${ans === i ? 'selected' : ''}" onclick="answer9Q('${q.id}', ${i})">
+            <div class="opt-radio"></div>
+            <div class="opt-label">${opt.label}</div>
+            <div class="opt-score">${opt.score}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="nav no-print">
+      <button class="btn btn-secondary" onclick="back9Q()">← ย้อนกลับ</button>
+      <button class="btn btn-primary" onclick="next9Q()" ${ans === undefined ? 'disabled' : ''}>
+        ${state.current9Q === total - 1 ? 'ดูผล 9Q →' : 'ถัดไป →'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function render8Q() {
+  const idx = state.current8Q;
+  const q = questions8Q[idx];
+  const total = questions8Q.length;
+  const pct = (idx / total) * 100;
+  const ans = state.q8Answers[q.id];
+  const score8 = calc8QScore();
+  const score9 = calc9QScore();
+
+  // Check if we need followup for q8_3
+  const showFollowup = q.followup && ans === 'yes';
+  const ansFollowup = q.followup ? state.q8Answers['q8_3b'] : undefined;
+
+  return `
+  <div class="step">
+    <div class="progress-wrap no-print">
+      <div class="progress-label"><span>8Q — ประเมินความเสี่ยงฆ่าตัวตาย</span><span>${idx + 1} / ${total}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.max(pct,5)}%; background: linear-gradient(90deg, #f87171, #fb923c);"></div></div>
+    </div>
+    <span class="stage-badge badge-8q no-print">● แบบประเมิน 8Q</span>
+    ${patientChip()}
+    
+    <div class="score-card">
+      <div class="score-circle" style="background:rgba(79,142,247,0.15);color:var(--accent-blue);">${score9}</div>
+      <div class="score-info">
+        <div class="score-name">9Q</div>
+        <div class="score-val c-blue">${score9} คะแนน — ${get9QLevel(score9).level}</div>
+      </div>
+      <div class="score-circle" style="background:rgba(248,113,113,0.15);color:var(--accent-red);margin-left:8px;">${score8}</div>
+      <div class="score-info">
+        <div class="score-name">8Q</div>
+        <div class="score-val c-red">${score8} คะแนน</div>
+      </div>
+    </div>
+
+    <div class="card">
+      ${q.period ? `<div class="question-num" style="color:var(--accent-orange);">⏱ ${q.period}</div>` : '<div class="question-num">ในช่วง 1 เดือนที่ผ่านมา</div>'}
+      <div class="question-text">${q.text}</div>
+      <div class="yesno">
+        <button class="yesno-btn yes-btn ${ans === 'yes' ? 'selected' : ''}" onclick="answer8Q('${q.id}','yes')">
+          ✓ มี / เคย
+        </button>
+        <button class="yesno-btn no-btn ${ans === 'no' ? 'selected' : ''}" onclick="answer8Q('${q.id}','no')">
+          ✗ ไม่มี / ไม่เคย
+        </button>
+      </div>
+      ${showFollowup ? `
+      <div class="question-sub" style="margin-top:16px;margin-bottom:16px;">
+        📌 ${q.followup.text}
+      </div>
+      <div class="yesno">
+        <button class="yesno-btn yes-btn ${ansFollowup === 'yes' ? 'selected' : ''}" onclick="answer8Q('q8_3b','yes')" style="font-size:13px;">
+          ✓ ${q.followup.yesLabel}
+        </button>
+        <button class="yesno-btn no-btn ${ansFollowup === 'no' ? 'selected' : ''}" onclick="answer8Q('q8_3b','no')" style="font-size:13px;">
+          ✗ ${q.followup.noLabel}
+        </button>
+      </div>` : ''}
+    </div>
+    <div class="nav no-print">
+      <button class="btn btn-secondary" onclick="back8Q()">← ย้อนกลับ</button>
+      <button class="btn btn-primary" onclick="next8Q()" ${isNext8QDisabled(q, ans, showFollowup, ansFollowup) ? 'disabled' : ''}>
+        ${idx === total - 1 ? 'ดูผลทั้งหมด →' : 'ถัดไป →'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function isNext8QDisabled(q, ans, showFollowup, ansFollowup) {
+  if (!ans) return true;
+  if (showFollowup && !ansFollowup) return true;
+  return false;
+}
+
+function patientChip() {
+  if (!state.hn) return '';
+  const d = state.assessDate ? formatDate(state.assessDate) : '-';
+  return `<div class="patient-chip no-print">
+    🏥 <strong>HN: ${state.hn}</strong>
+    <span style="color:var(--text-dim);">|</span>
+    📅 ${d}
+    ${state.assessorName ? `<span style="color:var(--text-dim);">|</span> 👤 ${state.assessorName}` : ''}
+  </div>`;
+}
+
+function formatDate(iso) {
+  if (!iso) return '-';
+  const [y, m, d] = iso.split('-');
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${parseInt(y)+543}`;
+}
+
+function renderResult() {
+  const score2Positive = Object.values(state.q2Answers).some(v => v === 'yes');
+  const score9 = calc9QScore();
+  const score8 = calc8QScore();
+  const r9 = get9QLevel(score9);
+  const r8 = get8QLevel(score8);
+  const urgent8Q = score8 >= 17;
+
+  const colorMap = { green: 'var(--accent-green)', blue: 'var(--accent-blue)', orange: 'var(--accent-orange)', red: 'var(--accent-red)' };
+  const bgMap = { green: 'rgba(52,211,153,0.15)', blue: 'rgba(79,142,247,0.15)', orange: 'rgba(251,146,60,0.15)', red: 'rgba(248,113,113,0.15)' };
+
+  const overallBad = r9.action === 'severe' || r8.action === 'severe' || r8.action === 'moderate';
+  const resultIcon = urgent8Q ? '🚨' : overallBad ? '⚠️' : r9.action === 'mild' || r9.action === 'moderate' ? '💛' : '✅';
+  const resultTitle = urgent8Q ? 'ต้องการความช่วยเหลือด่วน' : overallBad ? 'ควรพบผู้เชี่ยวชาญโดยเร็ว' : r9.action === 'mild' ? 'มีอาการซึมเศร้าระดับน้อย' : r9.action === 'moderate' ? 'มีอาการซึมเศร้าระดับปานกลาง' : 'สุขภาพจิตอยู่ในเกณฑ์ดี';
+
+  const plans = getActionPlan(r9.action, r8.action, urgent8Q);
+
+  return `
+  <div class="step">
+    <div class="result-hero">
+      <div class="result-icon" style="background:${bgMap[urgent8Q ? 'red' : r9.color]}; color:${colorMap[urgent8Q ? 'red' : r9.color]};">
+        ${resultIcon}
+      </div>
+      <div class="result-title">${resultTitle}</div>
+      <div class="result-subtitle">ผลการประเมินสุขภาพจิตของท่านมีดังนี้</div>
+    </div>
+
+    ${state.hn ? `
+    <div class="result-patient-bar">
+      <div class="rpb-item">
+        <div class="rpb-label">HN</div>
+        <div class="rpb-val">${state.hn}</div>
+      </div>
+      <div class="rpb-item">
+        <div class="rpb-label">วันที่ประเมิน</div>
+        <div class="rpb-val">${formatDate(state.assessDate)}</div>
+      </div>
+      ${state.assessorName ? `
+      <div class="rpb-item">
+        <div class="rpb-label">ผู้ประเมิน</div>
+        <div class="rpb-val">${state.assessorName}</div>
+      </div>` : ''}
+    </div>` : ''}
+
+    ${urgent8Q ? `
+    <div class="alert-urgent">
+      <div class="icon">🚨</div>
+      <div class="text">
+        <strong>ต้องการความช่วยเหลือด่วน!</strong>
+        คะแนน 8Q ≥ 17 กรุณาติดต่อโรงพยาบาลมีจิตแพทย์หรือสายด่วนสุขภาพจิตทันที อย่าปล่อยให้อยู่คนเดียว
+      </div>
+    </div>` : ''}
+
+    <div class="score-breakdown">
+      ${score2Positive !== undefined ? `
+      <div class="score-box" style="animation-delay:0.05s">
+        <div class="num" style="color:${score2Positive ? 'var(--accent-orange)' : 'var(--accent-green)'};">2Q</div>
+        <div class="label">แบบคัดกรอง</div>
+        <div class="level" style="background:${score2Positive ? 'rgba(251,146,60,0.15)' : 'rgba(52,211,153,0.15)'};color:${score2Positive ? 'var(--accent-orange)' : 'var(--accent-green)'};">
+          ${score2Positive ? 'มีความเสี่ยง' : 'ปกติ'}
+        </div>
+      </div>` : ''}
+      ${state.show8Q || score9 > 0 ? `
+      <div class="score-box" style="animation-delay:0.1s">
+        <div class="num" style="color:${colorMap[r9.color]};">${score9}</div>
+        <div class="label">คะแนน 9Q</div>
+        <div class="level" style="background:${bgMap[r9.color]};color:${colorMap[r9.color]};">${r9.level}</div>
+      </div>` : ''}
+      ${state.show8Q ? `
+      <div class="score-box" style="animation-delay:0.15s">
+        <div class="num" style="color:${colorMap[r8.color]};">${score8}</div>
+        <div class="label">คะแนน 8Q</div>
+        <div class="level" style="background:${bgMap[r8.color]};color:${colorMap[r8.color]};">${r8.level}</div>
+      </div>` : ''}
+    </div>
+
+    <div class="action-section">
+      <div class="action-title">📋 แผนดำเนินการ (Action Plan)</div>
+      ${plans.map(p => `
+      <div class="action-item">
+        <div class="action-dot" style="background:${p.bg};color:${p.color};">${p.icon}</div>
+        <div class="action-content">
+          <div class="action-label">${p.title}</div>
+          <div class="action-desc">${p.desc}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+
+    ${urgent8Q || r8.action !== 'none' ? `
+    <div class="action-section" style="animation-delay:0.15s;">
+      <div class="action-title">📞 สายด่วนและช่องทางขอความช่วยเหลือ</div>
+      <div class="hotline-grid">
+        <a class="hotline-btn" href="tel:1323">
+          <span>🧠</span>
+          <div><div class="num">1323</div><div style="font-size:11px;color:var(--text-muted);">กรมสุขภาพจิต</div></div>
+        </a>
+        <a class="hotline-btn" href="tel:02-4989999">
+          <span>🏥</span>
+          <div><div class="num">02-498-9999</div><div style="font-size:11px;color:var(--text-muted);">โรงพยาบาลสมเด็จเจ้าพระยา</div></div>
+        </a>
+        <a class="hotline-btn" href="tel:1669">
+          <span>🚑</span>
+          <div><div class="num">1669</div><div style="font-size:11px;color:var(--text-muted);">ฉุกเฉินทางการแพทย์</div></div>
+        </a>
+      </div>
+    </div>` : ''}
+
+    <div class="print-hotline">สายด่วนสุขภาพจิต: 1323 | ฉุกเฉิน: 1669 | โรงพยาบาลสมเด็จเจ้าพระยา: 02-498-9999</div>
+
+    <button class="btn-print no-print" onclick="window.print()">🖨️ พิมพ์ผลการประเมิน / บันทึก PDF</button>
+    <button class="btn-restart no-print" onclick="restartAssessment()">🔄 เริ่มประเมินผู้ป่วยรายใหม่</button>
+  </div>`;
+}
+
+function getActionPlan(action9, action8, urgent) {
+  const plans = [];
+
+  if (urgent) {
+    plans.push({ icon:'🚨', color:'#f87171', bg:'rgba(248,113,113,0.15)', title:'ส่งตัวโรงพยาบาลทันที', desc:'คะแนน 8Q ≥ 17 ควรนำส่งโรงพยาบาลที่มีจิตแพทย์โดยเร่งด่วน อย่าปล่อยให้อยู่คนเดียว' });
+    plans.push({ icon:'📞', color:'#34d399', bg:'rgba(52,211,153,0.15)', title:'โทรสายด่วน 1323', desc:'ติดต่อสายด่วนสุขภาพจิต 24 ชั่วโมง เพื่อขอคำปรึกษาและแนวทางการช่วยเหลือ' });
+  }
+
+  if (action8 === 'severe' && !urgent) {
+    plans.push({ icon:'🏥', color:'#fb923c', bg:'rgba(251,146,60,0.15)', title:'พบจิตแพทย์โดยเร็ว', desc:'มีความเสี่ยงสูง ควรนัดพบจิตแพทย์หรือนักจิตวิทยาภายใน 1-3 วัน' });
+  }
+  if (action8 === 'moderate') {
+    plans.push({ icon:'⚕️', color:'#4f8ef7', bg:'rgba(79,142,247,0.15)', title:'ปรึกษาผู้เชี่ยวชาญ', desc:'ควรพบจิตแพทย์หรือนักจิตวิทยาเพื่อประเมินและวางแผนการดูแลรักษา' });
+  }
+
+  if (action9 === 'severe') {
+    plans.push({ icon:'💊', color:'#f87171', bg:'rgba(248,113,113,0.15)', title:'รักษาด้วยยาและจิตบำบัด', desc:'ระดับรุนแรง จำเป็นต้องได้รับการรักษาจากจิตแพทย์ อาจต้องใช้ยาร่วมกับจิตบำบัด' });
+  } else if (action9 === 'moderate') {
+    plans.push({ icon:'🧑‍⚕️', color:'#fb923c', bg:'rgba(251,146,60,0.15)', title:'พบแพทย์หรือนักจิตวิทยา', desc:'ควรนัดพบจิตแพทย์ แพทย์เวชปฏิบัติ หรือนักจิตวิทยา เพื่อวางแผนการรักษา' });
+    plans.push({ icon:'🧘', color:'#a78bfa', bg:'rgba(167,139,250,0.15)', title:'ฝึกสติและผ่อนคลาย', desc:'ฝึกหายใจลึก การทำสมาธิ หรือเทคนิค Mindfulness อย่างน้อย 10 นาทีต่อวัน' });
+  } else if (action9 === 'mild') {
+    plans.push({ icon:'🗣️', color:'#4f8ef7', bg:'rgba(79,142,247,0.15)', title:'พูดคุยกับคนที่ไว้ใจ', desc:'เปิดใจพูดคุยกับเพื่อนสนิท คนในครอบครัว หรือผู้ให้คำปรึกษา' });
+    plans.push({ icon:'🏃', color:'#34d399', bg:'rgba(52,211,153,0.15)', title:'ออกกำลังกายสม่ำเสมอ', desc:'การออกกำลังกาย 30 นาที 3-5 ครั้งต่อสัปดาห์ช่วยลดอาการซึมเศร้าได้อย่างมีนัยสำคัญ' });
+  } else {
+    plans.push({ icon:'✅', color:'#34d399', bg:'rgba(52,211,153,0.15)', title:'รักษาสุขภาพจิตที่ดี', desc:'ผลการประเมินอยู่ในเกณฑ์ปกติ ดูแลตัวเองต่อไปด้วยการนอนหลับพักผ่อนและออกกำลังกาย' });
+  }
+
+  if (action9 !== 'none' || action8 !== 'none') {
+    plans.push({ icon:'📅', color:'#60a5fa', bg:'rgba(96,165,250,0.15)', title:'ติดตามผลการประเมินซ้ำ', desc:'ประเมินซ้ำทุก 2 สัปดาห์ถึง 1 เดือน เพื่อติดตามความเปลี่ยนแปลง' });
+  }
+
+  if (action9 === 'low' && action8 === 'none') {
+    plans.push({ icon:'💚', color:'#34d399', bg:'rgba(52,211,153,0.15)', title:'ดูแลสุขภาพแบบองค์รวม', desc:'นอนหลับ 7-8 ชั่วโมง รับประทานอาหารที่มีประโยชน์ สร้างความสัมพันธ์ที่ดีกับคนรอบข้าง' });
+  }
+
+  return plans;
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+
+function startAssessment() {
+  state.phase = '2q';
+  render();
+}
+
+function answer2Q(id, val) {
+  state.q2Answers[id] = val;
+  render();
+}
+
+function next2Q() {
+  const q = questions2Q[state.current2Q];
+  if (!state.q2Answers[q.id]) return;
+  if (state.current2Q < questions2Q.length - 1) {
+    state.current2Q++;
+    render();
+  } else {
+    // Check 2Q result
+    const hasYes = Object.values(state.q2Answers).some(v => v === 'yes');
+    if (!hasYes) {
+      // 2Q negative → stop
+      state.stoppedEarly = true;
+      state.stopReason = '2q_negative';
+      state.phase = 'result';
+    } else {
+      // 2Q positive → go to 9Q
+      state.phase = '9q';
+    }
+    render();
+  }
+}
+
+function back2Q() {
+  if (state.current2Q > 0) { state.current2Q--; render(); }
+  else { state.phase = 'patient'; render(); }
+}
+
+function answer9Q(id, val) {
+  state.q9Answers[id] = val;
+  render();
+}
+
+function next9Q() {
+  const q = questions9Q[state.current9Q];
+  if (state.q9Answers[q.id] === undefined) return;
+  if (state.current9Q < questions9Q.length - 1) {
+    state.current9Q++;
+    render();
+  } else {
+    // 9Q complete — check score
+    const score9 = calc9QScore();
+    if (score9 >= 7) {
+      state.show8Q = true;
+      state.phase = '8q';
+    } else {
+      // 9Q negative → show result
+      state.phase = 'result';
+    }
+    render();
+  }
+}
+
+function back9Q() {
+  if (state.current9Q > 0) { state.current9Q--; render(); }
+  else { state.phase = '2q'; state.current2Q = questions2Q.length - 1; render(); }
+}
+
+function answer8Q(id, val) {
+  state.q8Answers[id] = val;
+  render();
+}
+
+function next8Q() {
+  const q = questions8Q[state.current8Q];
+  const ans = state.q8Answers[q.id];
+  if (!ans) return;
+  if (q.followup && ans === 'yes' && !state.q8Answers['q8_3b']) return;
+
+  if (state.current8Q < questions8Q.length - 1) {
+    state.current8Q++;
+    render();
+  } else {
+    state.q8Score = calc8QScore();
+    state.phase = 'result';
+    render();
+  }
+}
+
+function back8Q() {
+  if (state.current8Q > 0) {
+    // Clear followup if going back from q after q8_3
+    if (state.current8Q === 3) delete state.q8Answers['q8_3b'];
+    state.current8Q--;
+    render();
+  } else {
+    state.phase = '9q';
+    state.current9Q = questions9Q.length - 1;
+    render();
+  }
+}
+
+function restartAssessment() {
+  resetState();
+  render();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
